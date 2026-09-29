@@ -196,8 +196,11 @@ def main():
     else:
         print(f"[抓取] 窗口 {day_start.strftime('%Y-%m-%d %H:%M')} ~ {day_end.strftime('%Y-%m-%d %H:%M')}")
         posts, meta = crawl_window_requests(day_start, end_dt=day_end)
-        if meta.get("intercepted"):
-            print("[失败] 直连被东财反爬拦截（验证页）")
+        if meta.get("intercepted") and len(posts) >= 100:
+            # 部分数据：拦截前已抓到足够帖子，用真实数据分析（半程数据）
+            print(f"[警告] 抓取被风控拦截，但已获得 {len(posts)} 条部分数据，继续分析")
+        elif meta.get("intercepted"):
+            print("[失败] 直连被东财反爬拦截（验证页）且数据不足")
             if degrade_with_existing(data_path, index_path, day_start, day_end):
                 print("[降级完成] 看板已用历史数据重建，流程正常结束")
                 return 0

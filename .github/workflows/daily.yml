@@ -46,9 +46,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json posts.json index.html posts_*.json
-          git commit -m "每日情绪分: $(TZ=Asia/Shanghai date +%Y-%m-%d)" || echo "无新数据可提交"
-          git push
+          git add -A
+          git diff --cached --quiet || git commit -m "每日情绪分: $(TZ=Asia/Shanghai date +%Y-%m-%d)"
+          git push || echo "无可推送内容"
 
       - name: 上传 Pages 产物
         uses: actions/upload-pages-artifact@v3
