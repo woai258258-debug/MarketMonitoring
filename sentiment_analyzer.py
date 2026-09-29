@@ -109,10 +109,7 @@ class SentimentAnalyzer:
         return False
 
     def _match_phrases_and_regex(self, text, matched_bullish, matched_bearish):
-        """Substring phrases and contextual regex (e.g. flee to Nikkei/Nasdaq).
-        Returns strong_bear: True when a bearish phrase/regex hit (强语境裁决，
-        用于把同句的普通多头词翻空，如"反弹出局"里"反弹"不再计多头)。"""
-        strong_bear = False
+        """Substring phrases and contextual regex (e.g. flee to Nikkei/Nasdaq)."""
         for phrase in self.bullish_phrases:
             if phrase in text:
                 matched_bullish.append(phrase)
@@ -120,7 +117,6 @@ class SentimentAnalyzer:
         for phrase in self.bearish_phrases:
             if phrase in text:
                 matched_bearish.append(phrase)
-                strong_bear = True
 
         is_news = self._is_news_neutral(text)
         for rule in self.bearish_regex:
@@ -132,14 +128,13 @@ class SentimentAnalyzer:
                 continue
             if re.search(pattern, text):
                 matched_bearish.append(tag)
-                strong_bear = True
-        return strong_bear
 
     # 反讽前置线索（出现在多头词前面）
     _SARCASM_PREFIX_CUES = (
         "所谓的", "所谓", "你们说的", "你以为的", "什么破", "什么",
         "哪来的", "哪有", "吹的", "假的", "假", "呵呵", "你们吹的",
         "又是你们", "好一个", "真会", "真棒", "厉害",
+        "恭喜", "真牛", "真是牛", "服了",
     )
     # 反讽后置线索（出现在多头词后面）
     _SARCASM_SUFFIX_CUES = (
@@ -151,12 +146,15 @@ class SentimentAnalyzer:
         "半山腰", "地板", "地心", "腰斩", "跌停", "创新低", "割肉",
         "血洗", "深套", "爆仓", "跌麻", "亏麻", "一天跌", "又跌",
         "跌三个", "跌停潮", "姥姥家", "地心里",
+        "出局", "减仓", "别信", "不要信", "末端", "尾声",
+        "本金没回来", "没子弹", "没一个涨", "没有抢过", "没抢到", "跑得快",
     )
     # 整句阴阳标记：出现则把句内多头词整体翻空
     _SARCASM_SENTENCE_MARKERS = (
         "呵呵", "个屁", "你个头", "真会玩", "牛到姥姥家", "飞到地心",
         "香到割肉", "快乐你们不懂", "氛围拉满", "又创新低", "抄到半山腰",
-        "买在半山腰", "干到腰斩",
+        "买在半山腰", "干到腰斩", "拍大腿", "黑色星期一", "又要拍大腿",
+        "跌的很舒服", "有救了", "熟悉的味道", "温水煮青蛙", "裤衩子",
     )
 
     def _has_sarcasm_cue(self, text, keyword):
@@ -200,6 +198,12 @@ class SentimentAnalyzer:
             r"(?:跌|创新低|腰斩|跌停|割肉|亏)", text
         ):
             return True
+        # 大跌日「只有 N 支是红的，牛市啊」反讽
+        if re.search(r"只有.{0,3}\d+.{0,10}红", text):
+            return True
+        # 反弹离场语境（反弹出局/反弹离场/反弹结束/反弹不要信）
+        if re.search(r"反弹.{0,8}(?:出局|离场|减仓|别信|不要信|结束|末端|尾声|清仓|跑|逃|(?:没|没有)抢过|都是.{0,4}(?:离场|机会|逃))", text):
+            return True
         return False
 
     def _sentence_sarcasm(self, text):
@@ -219,6 +223,64 @@ class SentimentAnalyzer:
             return True
         return False
 
+    # 强方向语境词：多空词同现时用于裁决最终极性（避免"利好+利空/涨+跌"相互中和）
+    _STRONG_BEAR_CTX = (
+        "跌", "崩", "亏", "逃", "割", "腰斩", "凉", "惨", "套", "跑", "抛", "砸",
+        "清仓", "销户", "退市", "恐慌", "绝望", "完", "死", "哭", "血", "新低", "杀",
+        "跳水", "蒸发", "破位", "离场", "空仓", "绿", "救", "接盘", "站岗",
+        "下跌", "暴跌", "大跌", "阴跌", "重挫", "巨亏", "血亏", "跌停潮",
+    )
+    _STRONG_BULL_CTX = (
+        "涨", "飞", "牛", "赚", "红", "新高", "反弹", "拉升", "抄底", "加仓", "买",
+        "涨停", "反转", "企稳", "见底", "突破", "大阳", "连板", "抢筹", "封板", "踏空",
+        "暴涨", "大涨", "普涨", "收红", "主升",
+    )
+
+    def _has_negation_before(self, text, pos):
+        """检查词位置前 2 个字符内是否出现否定词（子串召回时排除"不会大涨/没救了"式误判）"""
+        if pos <= 0:
+            return False
+        prefix = text[max(0, pos - 2):pos]
+        return any(n in prefix for n in self.negation_words)
+
+    def _substring_recall(self, text):
+        """子串召回：词库 2 字以上词直接在标题中检索，大幅提升恐慌/亢奋表达召回率。
+        仅在两通道均 0 命中时启用；按词长降序去重（长词命中则跳过被包含的短词）。"""
+        bull_hits, bear_hits = [], []
+        for w in sorted(self.bullish_words + self.bullish_phrases, key=len, reverse=True):
+            if len(w) < 2 or w not in text:
+                continue
+            if any(w in h for h in bull_hits if h != w):
+                continue
+            if self._has_negation_before(text, text.find(w)):
+                continue
+            bull_hits.append(w)
+        for w in sorted(self.bearish_words + self.bearish_phrases, key=len, reverse=True):
+            if len(w) < 2 or w not in text:
+                continue
+            if any(w in h for h in bear_hits if h != w):
+                continue
+            if self._has_negation_before(text, text.find(w)):
+                continue
+            bear_hits.append(w)
+        return bull_hits, bear_hits
+
+    def _apply_context_arbitration(self, text, pos, neg):
+        """强语境裁决：多空词同现且势均力敌时，用强语境词决定最终极性。"""
+        strong_bear = sum(1 for k in self._STRONG_BEAR_CTX if k in text)
+        strong_bull = sum(1 for k in self._STRONG_BULL_CTX if k in text)
+        if pos == neg:
+            if strong_bear > strong_bull:
+                neg += 1
+            elif strong_bull > strong_bear:
+                pos += 1
+        elif pos > 0 and neg > 0:
+            if strong_bear > strong_bull and neg >= pos:
+                pos = max(0, pos - 1)
+            elif strong_bull > strong_bear and pos >= neg:
+                neg = max(0, neg - 1)
+        return pos, neg
+
     def analyze_single_text(self, text):
         """Analyze a single piece of text and return sentiment score and matched words with negation flipping"""
         if not text:
@@ -226,19 +288,11 @@ class SentimentAnalyzer:
         
         matched_bullish = []
         matched_bearish = []
-        strong_bear = self._match_phrases_and_regex(text, matched_bullish, matched_bearish)
+        self._match_phrases_and_regex(text, matched_bullish, matched_bearish)
 
         sentence_sarcasm = self._sentence_sarcasm(text) or self._has_contrast_irony(text)
 
-        # 子串召回：词库单词直接做原文子串匹配，避免 jieba 分词拆词漏判
-        for w in self.bullish_words:
-            if len(w) >= 2 and w in text and w not in matched_bullish:
-                matched_bullish.append(w)
-        for w in self.bearish_words:
-            if len(w) >= 2 and w in text and w not in matched_bearish:
-                matched_bearish.append(w)
-
-        # Segment text for lexicon tokens (保持原逻辑用于否定词前视)
+        # Segment text for lexicon tokens
         words = jieba.lcut(text)
         
         for i, word in enumerate(words):
@@ -259,31 +313,27 @@ class SentimentAnalyzer:
                 has_sarcasm = is_bullish and (
                     self._has_sarcasm_cue(text, word) or sentence_sarcasm
                 )
-                # 强语境裁决：空头短语/正则命中时，同句普通多头词翻空（"反弹出局"的"反弹"不计多头）
-                strong_bear_overrides = is_bullish and strong_bear
-
-                if is_bullish:
-                    # 多头词处理：否定/反讽/强空头语境 → 翻空
-                    if has_negation or has_sarcasm or strong_bear_overrides:
-                        if strong_bear_overrides and not has_sarcasm and not has_negation:
-                            tag = f"强-{word}"
-                        elif has_sarcasm and not has_negation:
-                            tag = f"讽-{word}"
-                        else:
-                            tag = f"不-{word}"
+                
+                if has_negation or has_sarcasm:
+                    if is_bullish:
+                        tag = f"讽-{word}" if has_sarcasm and not has_negation else f"不-{word}"
                         matched_bearish.append(tag)
                     else:
-                        matched_bullish.append(word)
+                        # 「不割肉不恐慌，主力一直砸」类：否定+空头词≠看多
+                        # 仅当文本无其他强空头语境时才翻转；否则视为语气弱化丢弃
+                        ctx_words = set(self._STRONG_BEAR_CTX)
+                        ctx_words.discard(word)
+                        strong_ctx = any(c in text for c in ctx_words)
+                        other_bear = any(w in text for w in self.bearish_words if w != word and len(w) >= 2)
+                        if strong_ctx or other_bear:
+                            pass  # 丢弃，避免把"不割肉"误翻成多头
+                        else:
+                            matched_bullish.append(f"不-{word}")
                 else:
-                    # 空头词处理：否定翻转缺陷修正
-                    # "不割肉不恐慌主力一直砸"——句内已有强空头语境/其他空头词时，不把空头词翻多
-                    other_bear = len([m for m in matched_bearish if not m.startswith(("不-", "讽-", "强-"))]) > 0
-                    if not has_negation:
-                        matched_bearish.append(word)
-                    elif strong_bear or other_bear:
-                        matched_bearish.append(word)
+                    if is_bullish:
+                        matched_bullish.append(word)
                     else:
-                        matched_bullish.append(f"不-{word}")
+                        matched_bearish.append(word)
 
         # 对比阴阳命中但词库未命中多头词时，补一条空头标记，避免漏判
         if sentence_sarcasm and not matched_bearish and not matched_bullish:
@@ -302,6 +352,19 @@ class SentimentAnalyzer:
         
         pos = len(matched_bullish)
         neg = len(matched_bearish)
+
+        # ===== 增强 1：子串召回（仅两通道均 0 命中时启用，减少恐慌/亢奋漏判）=====
+        if pos == 0 and neg == 0:
+            sub_bull, sub_bear = self._substring_recall(text)
+            matched_bullish.extend(sub_bull)
+            matched_bearish.extend(sub_bear)
+            pos = len(matched_bullish)
+            neg = len(matched_bearish)
+
+        # ===== 增强 2：强语境裁决（多空词同现时按语境定方向）=====
+        if pos > 0 and neg > 0:
+            pos, neg = self._apply_context_arbitration(text, pos, neg)
+
         total = pos + neg
         
         score = 0.0
@@ -371,7 +434,7 @@ class SentimentAnalyzer:
             # 中性帖降权：无情绪帖占比常超 70%，会稀释情绪指数（恐慌/亢奋日判定失效的根因）
             neutral_discount = 1.0
             if score == 0.0:
-                neutral_discount = getattr(self, "neutral_weight_scale", 0.2)
+                neutral_discount = self.neutral_weight_scale
                 final_weight *= neutral_discount
             
             analyzed_posts.append({
@@ -390,6 +453,7 @@ class SentimentAnalyzer:
                 "neg_words": neg_words,
                 "spammer_penalty": round(spammer_penalty, 4),
                 "time_decay": round(time_decay, 4),
+                "neutral_discount": neutral_discount,
                 "final_weight": round(final_weight, 4)
             })
 
@@ -470,6 +534,8 @@ class SentimentAnalyzer:
                 "bullish_posts": pos_posts_count,
                 "bearish_posts": neg_posts_count,
                 "neutral_posts": neu_posts_count,
+                "sentiment_participation": round((pos_posts_count + neg_posts_count) / len(analyzed_posts), 4) if analyzed_posts else 0.0,
+                "panic_ratio": round(neg_posts_count / max(1, pos_posts_count + neg_posts_count), 4),
                 "last_updated": format_beijing(),
                 "sources_used": sorted({p.get("source", "eastmoney") for p in analyzed_posts}),
             },
