@@ -30,14 +30,19 @@ from data_store import save_bundle
 from dashboard_generator import DashboardGenerator
 
 
-def load_raw(path):
-    posts = json.load(open(path, encoding="utf-8"))
+def normalize_posts(posts):
+    """把 read_count/reply_count 从字符串统一转为 int"""
     for p in posts:
         if isinstance(p.get("read_count"), str):
             p["read_count"] = parse_number(p["read_count"])
         if isinstance(p.get("reply_count"), str):
             p["reply_count"] = parse_number(p["reply_count"])
     return posts
+
+
+def load_raw(path):
+    posts = json.load(open(path, encoding="utf-8"))
+    return normalize_posts(posts)
 
 
 def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_path, config_path):
@@ -214,6 +219,8 @@ def main():
         raw_path = ROOT / f"posts_{day_start.strftime('%Y%m%d')}_raw.json"
         json.dump(posts, open(raw_path, "w", encoding="utf-8"), ensure_ascii=False)
         print(f"[抓取] 已保存原始数据 {raw_path}")
+
+    posts = normalize_posts(posts)
 
     if not posts:
         print("[失败] 没有帖子数据")
