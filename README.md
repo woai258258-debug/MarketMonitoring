@@ -1,12 +1,12 @@
 # MarketMonitoring · 大A情绪分参考
 
-[![Daily Analysis](https://github.com/hyan1985/MarketMonitoring/actions/workflows/daily.yml/badge.svg)](https://github.com/hyan1985/MarketMonitoring/actions/workflows/daily.yml)
+[![Daily Analysis](https://github.com/woai258258-debug/MarketMonitoring/actions/workflows/daily.yml/badge.svg)](https://github.com/woai258258-debug/MarketMonitoring/actions/workflows/daily.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](requirements.txt)
 
 > 多源爬取 A 股论坛帖子，基于词频词典做情绪量化，并结合 TuShare 市场数据估算大盘综合风险值，自动生成可视化看板。
 
-**在线看板：** https://hyan1985.github.io/MarketMonitoring/
+**在线看板：** https://woai258258-debug.github.io/MarketMonitoring/
 
 ---
 
@@ -86,7 +86,7 @@
 ### 本地运行
 
 ```bash
-git clone https://github.com/hyan1985/MarketMonitoring.git
+git clone https://github.com/woai258258-debug/MarketMonitoring.git
 cd MarketMonitoring
 pip install -r requirements.txt
 cp config.example.json config.json   # 按需填写 TuShare Token 等
