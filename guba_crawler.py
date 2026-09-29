@@ -54,14 +54,28 @@ class GubaCrawler:
         headers["User-Agent"] = random.choice(USER_AGENTS)
         
         print(f"  [Crawler] Fetching page {page_num}: {url}...")
-        try:
-            response = requests.get(url, headers=headers, timeout=10)
-            if response.status_code != 200:
-                print(f"  [Crawler] Error: Received status code {response.status_code} for page {page_num}", file=sys.stderr)
-                return []
-            
-            response.encoding = 'utf-8'
-            soup = BeautifulSoup(response.text, 'html.parser')
+        # 反风控：验证页检测 + 指数退避重试（东财偶发 IP 级"身份核实"风控）
+        for attempt in range(4):
+            try:
+                response = requests.get(url, headers=headers, timeout=15)
+                if response.status_code != 200:
+                    print(f"  [Crawler] Error: Received status code {response.status_code} for page {page_num}", file=sys.stderr)
+                    return []
+                response.encoding = 'utf-8'
+                if len(response.text) < 5000 or "身份核实" in response.text or "请输入验证码" in response.text:
+                    wait = 30 * (2 ** attempt) + random.randint(5, 20)
+                    print(f"  [Crawler] 触发风控验证页（{len(response.text)}B），等待 {wait}s 后重试 ({attempt+1}/4)...", file=sys.stderr)
+                    time.sleep(wait)
+                    headers["User-Agent"] = random.choice(USER_AGENTS)
+                    continue
+                soup = BeautifulSoup(response.text, 'html.parser')
+                break
+            except requests.exceptions.RequestException as e:
+                print(f"  [Crawler] 请求异常 {e}，等待重试 ({attempt+1}/4)...", file=sys.stderr)
+                time.sleep(20 * (attempt + 1))
+        else:
+            print(f"  [Crawler] page {page_num} 连续风控/失败，放弃该页", file=sys.stderr)
+            return []
             
             # Find all table rows with class 'listitem'
             rows = soup.find_all('tr', class_='listitem')
