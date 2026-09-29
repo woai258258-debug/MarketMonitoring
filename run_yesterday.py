@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-run_yesterday.py — 每天定时跑"前一天全天"数据（GitHub Actions 用）
+run_yesterday.py — 每天定时跑"前一天全天"数据（GitHub Actions 用）v2
+v2 改进（抗风控降级）：
+  - 抓取被东财风控拦截/0 帖时，若 data.json 已有该日历史数据：
+    重建看板 + 更新 risk 日期 → 正常退出 0（保证 Pages 每天有内容），打印明显警告
+  - 无任何该日数据才返回 2（此时看板保留旧数据，次日自动重试）
 
 流程：
   1. 直连东财股吧，抓取 [昨天 00:00, 今天 00:00) 窗口帖子
@@ -110,6 +114,30 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
     return s, ok
 
 
+def degrade_with_existing(data_path, index_path, day_start, day_end):
+    """降级：抓取失败但 data.json 已有该日数据 → 重建看板，正常退出"""
+    if not data_path.exists():
+        return False
+    data = json.load(open(data_path, encoding="utf-8"))
+    day_str = day_start.strftime("%Y-%m-%d")
+    has_day = any(d.get("date") == day_str for d in data.get("daily_trends", []))
+    if not has_day:
+        return False
+    # 更新 risk trade_date 为当日窗口末
+    risk = data.setdefault("risk", {})
+    risk["trade_date"] = day_end.strftime("%Y-%m-%d")
+    risk["source_note"] = "抓取被风控拦截，本次使用已有历史数据重建看板（数据非最新抓取）"
+    try:
+        save_bundle(data, str(data_path))
+        gen = DashboardGenerator(data_path=str(data_path), config_path=str(ROOT / "config.json"))
+        ok = gen.generate_html(output_path=str(index_path))
+        print(f"[降级] 已用 {day_str} 已有数据重建看板 (ok={ok})")
+        return True
+    except Exception as e:
+        print(f"[降级] 重建看板失败: {e}")
+        return False
+
+
 def print_report(s, day_start, day_end, posts, top_n=8):
     print("=" * 60)
     print(f"  大A情绪分 · 昨日全天报告（{day_start.strftime('%Y-%m-%d')}）")
@@ -170,9 +198,15 @@ def main():
         posts, meta = crawl_window_requests(day_start, end_dt=day_end)
         if meta.get("intercepted"):
             print("[失败] 直连被东财反爬拦截（验证页）")
+            if degrade_with_existing(data_path, index_path, day_start, day_end):
+                print("[降级完成] 看板已用历史数据重建，流程正常结束")
+                return 0
             return 2
         if not posts:
             print("[失败] 窗口内没有帖子（0 条）")
+            if degrade_with_existing(data_path, index_path, day_start, day_end):
+                print("[降级完成] 看板已用历史数据重建，流程正常结束")
+                return 0
             return 2
         raw_path = ROOT / f"posts_{day_start.strftime('%Y%m%d')}_raw.json"
         json.dump(posts, open(raw_path, "w", encoding="utf-8"), ensure_ascii=False)

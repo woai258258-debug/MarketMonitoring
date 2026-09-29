@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-crawl_recent.py — 东财股吧抓取规则 v2（云环境直连版，适用于 GitHub Actions 定时任务）
-
-核心规则：
-  1. parse_list_time: 支持 "MM-DD HH:MM" / "HH:MM"，年份推断（未来时间回退一年）
-  2. parse_number: 万/k 解析阅读数/回复数
-  3. parse_list_rows: 解析 table tbody tr 五列（阅读/回复/标题/作者/时间）
-  4. crawl_window_requests: 直连翻页抓取指定时间窗口，验证页检测（intercepted）
+crawl_recent.py — 东财股吧抓取规则 v3（云环境直连版，适用于 GitHub Actions 定时任务）
+v3 抗风控增强：
+  1. UA 轮换（Chrome/Edge/Mac 三选一）
+  2. 请求间隔随机化（0.6~1.8s），更像人工浏览
+  3. 风控冷却升级：指数退避（60s 起步，每轮翻倍，最长 5 分钟），总重试窗口可至 ~1 小时
 """
 import json
 import os
+import random
 import re
 import subprocess
 import tempfile
@@ -17,8 +16,14 @@ import time
 from datetime import datetime, timedelta
 
 GUBA_LIST_URL = "https://guba.eastmoney.com/list,zssh000001,f_{page}.html"
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+UAS = [
+    ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+     "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"),
+    ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+     "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"),
+    ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+     "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"),
+]
 VERIFY_MARKER_LEN = 5000  # 验证页 body 长度远小于正常页（正常 >100KB）
 
 
@@ -67,35 +72,10 @@ def parse_number(s):
     return int(num)
 
 
-EXTRACT_JS = r"""
-(() => {
-  const rows = document.querySelectorAll('table tbody tr');
-  const out = [];
-  for (const tr of rows) {
-    const tds = tr.querySelectorAll(':scope > td');
-    if (tds.length < 5) continue;
-    const txt = i => (tds[i].innerText || '').trim();
-    const a = tds[2].querySelector('a');
-    const title = a ? a.innerText.trim() : txt(2);
-    const href = a ? a.getAttribute('href') || '' : '';
-    const m = href.match(/(\d+)\.html/);
-    out.push({
-      read: txt(0), reply: txt(1), title, author: txt(3), time: txt(4),
-      href, post_id: m ? m[1] : ''
-    });
-  }
-  return out;
-})()
-"""
-
-
 def parse_list_rows(html):
     """从直连 HTML 中解析帖子行（table tbody tr 五列）"""
     rows = []
-    # 简化：用正则抓 a[data-postid] 行 + 邻近 td 文本（东财列表结构稳定）
-    pattern = re.compile(
-        r'<tr[^>]*>(.*?)</tr>', re.S
-    )
+    pattern = re.compile(r'<tr[^>]*>(.*?)</tr>', re.S)
     for tr_m in pattern.finditer(html):
         tr = tr_m.group(1)
         tds = re.findall(r'<td[^>]*>(.*?)</td>', tr, re.S)
@@ -122,10 +102,11 @@ def parse_list_rows(html):
 def curl_get(url, timeout=20):
     """用 curl 拉取页面（TLS 指纹比 requests 更接近真实浏览器，云环境放行率高）"""
     tmp = tempfile.mktemp(suffix=".html")
+    ua = random.choice(UAS)
     try:
         r = subprocess.run(
             ["curl", "-s", "-L", "--compressed", "--max-time", str(timeout),
-             "-A", UA,
+             "-A", ua,
              "-H", "Referer: https://guba.eastmoney.com/",
              "-H", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
              "-H", "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
@@ -153,7 +134,7 @@ def fetch_page(page, max_retry=3):
         if body is None:
             if i == max_retry - 1:
                 return "error", "network"
-            time.sleep(2)
+            time.sleep(2 + random.random() * 2)
             continue
         if len(body) < VERIFY_MARKER_LEN or "身份核实" in body[:2000]:
             return "intercepted", None
@@ -162,7 +143,9 @@ def fetch_page(page, max_retry=3):
 
 
 def crawl_window_requests(cutoff, end_dt=None, max_pages=260):
-    """翻页抓取 [cutoff, end_dt] 窗口；页内最早时间 < cutoff 即停"""
+    """翻页抓取 [cutoff, end_dt] 窗口；页内最早时间 < cutoff 即停
+    v3：UA 轮换 + 随机间隔 + 指数退避冷却（60s/120s/240s/300s...），单次最多 ~1 小时重试
+    """
     now = end_dt or datetime.now()
     results, seen = [], set()
     stopped = False
@@ -171,15 +154,13 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=260):
     for page in range(1, max_pages + 1):
         status, body = fetch_page(page)
         if status == "intercepted":
-            # 冷却重试：等待 60s 后重试，最多 20 次（适合 GitHub Actions 长任务）
+            # 指数退避冷却：60/120/240/300s，最多 20 轮
             if cooldown_waits < 20:
                 cooldown_waits += 1
-                print(f"[抓取] page {page}: 触发风控，等待 {cooldown_waits * 60}s 冷却后重试...")
-                time.sleep(60)
+                wait = min(60 * (2 ** (cooldown_waits - 1)), 300)
+                print(f"[抓取] page {page}: 触发风控，等待 {wait}s 冷却后重试（第 {cooldown_waits} 轮）...")
+                time.sleep(wait)
                 status, body = fetch_page(page)
-                if status == "intercepted":
-                    time.sleep(60)
-                    status, body = fetch_page(page)
             if status == "intercepted":
                 intercepted = True
                 print(f"[抓取] page {page}: 冷却重试仍被拦截，放弃")
@@ -214,7 +195,7 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=260):
             stopped = True
             break
         print(f"[抓取] page {page}: 新增 {page_new}，累计 {len(results)}，最早 {min(page_dts).strftime('%m-%d %H:%M') if page_dts else '-'}")
-        time.sleep(0.4)
+        time.sleep(0.6 + random.random() * 1.2)
     print(f"[抓取] 完成: {len(results)} 条, stopped={stopped}, intercepted={intercepted}")
     return results, {"stopped": stopped, "intercepted": intercepted}
 
