@@ -1,67 +1,67 @@
-name: Daily Sentiment Analysis
+name: 每日情绪分 - 昨日数据
 
 on:
   schedule:
-    # 北京时间每天 00:30（0 点后）= UTC 16:30，抓取前一自然日全天帖子
-    # 抓取前一自然日全天帖子，TuShare 取该日或之前最近已入库交易日行情
-    - cron: "30 16 * * *"
-  workflow_dispatch:
-    inputs:
-      target_day:
-        description: 分析哪一天（北京时间）
-        required: true
-        default: yesterday
-        type: choice
-        options:
-          - today
-          - yesterday
+    - cron: '0 17 * * *'   # 每天 17:00 UTC = 北京时间凌晨 01:00
+  workflow_dispatch:        # 支持手动触发
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-sentiment
+  cancel-in-progress: false
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    timeout-minutes: 300
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-python@v6
+      - name: 检出代码
+        uses: actions/checkout@v4
         with:
-          python-version: "3.11"
-          cache: pip
-          cache-dependency-path: requirements.txt
+          fetch-depth: 0
 
-      - name: Prepare config
-        run: cp config.example.json config.json
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run daily sentiment analysis (Beijing time)
-        env:
-          TZ: Asia/Shanghai
-          TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+      - name: 安装依赖
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            DAY="${{ inputs.target_day }}"
-          else
-            DAY="yesterday"
-          fi
-          echo "Running: python main.py --${DAY} --no-browser"
-          python main.py "--${DAY}" --no-browser
+          python -m pip install --upgrade pip
+          pip install jieba requests
+          sudo apt-get update -y && sudo apt-get install -y curl 2>/dev/null || true
 
-      - name: Commit results
+      - name: 抓取昨日数据 + 情绪分析 + 更新看板
+        run: python run_yesterday.py
         env:
+          PYTHONIOENCODING: utf-8
           TZ: Asia/Shanghai
+
+      - name: 提交结果
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data.json posts.json index.html
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: daily sentiment $(date +%Y-%m-%d)"
-            git push
-          fi
+          git add data.json posts.json index.html posts_*.json
+          git commit -m "每日情绪分: $(TZ=Asia/Shanghai date +%Y-%m-%d)" || echo "无新数据可提交"
+          git push
+
+      - name: 上传 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: analyze
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

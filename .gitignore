@@ -5,4 +5,4 @@ __pycache__/
 .venv/
 venv/
 *.log
-config.json
+# config.json（词库核心，需提交）

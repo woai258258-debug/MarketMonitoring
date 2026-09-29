@@ -205,3 +205,8 @@ git push -u origin main
 ## License
 
 [MIT](LICENSE)
+
+## 云部署（GitHub Actions 每日自动跑）
+- `.github/workflows/daily.yml`：每天 17:00 UTC（北京时间凌晨 1:00）自动抓取**前一天全天**东财上证股吧数据 → 情绪分析 → 更新看板 → 提交回仓库 → 部署 GitHub Pages
+- 数据通道：curl 直连（TLS 指纹）+ 移动 UA + 慢速翻页 + 风控冷却重试；失败自动重试
+- 手动触发：GitHub Actions 页面点 Run workflow
