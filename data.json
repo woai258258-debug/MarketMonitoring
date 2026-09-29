@@ -1,268 +1,270 @@
 {
   "summary": {
-    "overall_weighted_score": -0.4235,
-    "total_posts": 251,
-    "valid_posts": 249,
-    "spam_posts": 2,
-    "bullish_posts": 25,
-    "bearish_posts": 86,
-    "neutral_posts": 138,
-    "last_updated": "2026-09-29 20:18:11",
+    "overall_weighted_score": 0.6922,
+    "total_posts": 426,
+    "valid_posts": 426,
+    "spam_posts": 0,
+    "bullish_posts": 115,
+    "bearish_posts": 92,
+    "neutral_posts": 219,
+    "sentiment_participation": 0.4859,
+    "panic_ratio": 0.4444,
+    "last_updated": "2026-09-30 01:37:07",
     "sources_used": [
       "eastmoney"
     ],
-    "scan_date": "2026-09-28",
-    "crawled_posts": 251,
-    "window_start": "2026-09-28 00:00",
-    "window_end": "2026-09-29 00:00",
+    "scan_date": "2026-09-29",
+    "crawled_posts": 426,
+    "window_start": "2026-09-29 00:00",
+    "window_end": "2026-09-30 00:00",
     "window_hours": "昨日全天",
     "top_bullish_words": [
       {
         "word": "反弹",
+        "count": 28
+      },
+      {
+        "word": "利好",
         "count": 13
       },
       {
-        "word": "放量",
-        "count": 10
-      },
-      {
         "word": "修复",
+        "count": 12
+      },
+      {
+        "word": "涨",
         "count": 10
       },
       {
-        "word": "新高",
-        "count": 8
+        "word": "上涨",
+        "count": 10
       },
       {
-        "word": "加仓",
-        "count": 5
+        "word": "止跌",
+        "count": 9
       },
       {
-        "word": "突破",
-        "count": 4
+        "word": "涨停",
+        "count": 7
       },
       {
-        "word": "回升",
-        "count": 4
-      },
-      {
-        "word": "低吸",
-        "count": 4
-      },
-      {
-        "word": "底部",
+        "word": "放量",
         "count": 4
       },
       {
         "word": "探底回升",
+        "count": 4
+      },
+      {
+        "word": "回暖",
+        "count": 4
+      },
+      {
+        "word": "大涨",
         "count": 3
       },
       {
-        "word": "抄底",
+        "word": "底部",
         "count": 3
       },
       {
-        "word": "回本",
-        "count": 2
+        "word": "阳线",
+        "count": 3
       },
       {
-        "word": "连阳",
-        "count": 2
+        "word": "布局",
+        "count": 3
       },
       {
-        "word": "上涨",
-        "count": 2
-      },
-      {
-        "word": "强势",
-        "count": 2
+        "word": "企稳",
+        "count": 3
       }
     ],
     "top_bearish_words": [
       {
-        "word": "下跌",
-        "count": 44
+        "word": "量化跌幅",
+        "count": 29
       },
       {
         "word": "大跌",
-        "count": 34
-      },
-      {
-        "word": "调整",
-        "count": 23
-      },
-      {
-        "word": "暴跌",
         "count": 13
       },
       {
-        "word": "重挫",
-        "count": 12
+        "word": "下跌",
+        "count": 9
       },
       {
-        "word": "回调",
-        "count": 11
-      },
-      {
-        "word": "量化跌幅",
-        "count": 10
-      },
-      {
-        "word": "杀跌",
-        "count": 10
-      },
-      {
-        "word": "跌停",
+        "word": "冲高回落",
         "count": 8
       },
       {
-        "word": "跳水",
+        "word": "调整",
         "count": 7
       },
       {
-        "word": "熊市",
-        "count": 6
-      },
-      {
         "word": "新低",
-        "count": 6
+        "count": 5
       },
       {
-        "word": "崩了",
-        "count": 6
+        "word": "暴跌",
+        "count": 5
       },
       {
-        "word": "领跌",
-        "count": 6
+        "word": "减仓",
+        "count": 5
       },
       {
-        "word": "大阴线",
-        "count": 6
+        "word": "谨慎",
+        "count": 5
+      },
+      {
+        "word": "高开低走",
+        "count": 4
+      },
+      {
+        "word": "跳水",
+        "count": 4
+      },
+      {
+        "word": "收跌",
+        "count": 3
+      },
+      {
+        "word": "讽-涨",
+        "count": 3
+      },
+      {
+        "word": "清仓",
+        "count": 3
+      },
+      {
+        "word": "跌停",
+        "count": 3
       }
     ]
   },
   "top_bullish_words": [
     {
       "word": "反弹",
+      "count": 28
+    },
+    {
+      "word": "利好",
       "count": 13
     },
     {
-      "word": "放量",
-      "count": 10
-    },
-    {
       "word": "修复",
+      "count": 12
+    },
+    {
+      "word": "涨",
       "count": 10
     },
     {
-      "word": "新高",
-      "count": 8
+      "word": "上涨",
+      "count": 10
     },
     {
-      "word": "加仓",
-      "count": 5
+      "word": "止跌",
+      "count": 9
     },
     {
-      "word": "突破",
-      "count": 4
+      "word": "涨停",
+      "count": 7
     },
     {
-      "word": "回升",
-      "count": 4
-    },
-    {
-      "word": "低吸",
-      "count": 4
-    },
-    {
-      "word": "底部",
+      "word": "放量",
       "count": 4
     },
     {
       "word": "探底回升",
+      "count": 4
+    },
+    {
+      "word": "回暖",
+      "count": 4
+    },
+    {
+      "word": "大涨",
       "count": 3
     },
     {
-      "word": "抄底",
+      "word": "底部",
       "count": 3
     },
     {
-      "word": "回本",
-      "count": 2
+      "word": "阳线",
+      "count": 3
     },
     {
-      "word": "连阳",
-      "count": 2
+      "word": "布局",
+      "count": 3
     },
     {
-      "word": "上涨",
-      "count": 2
-    },
-    {
-      "word": "强势",
-      "count": 2
+      "word": "企稳",
+      "count": 3
     }
   ],
   "top_bearish_words": [
     {
-      "word": "下跌",
-      "count": 44
+      "word": "量化跌幅",
+      "count": 29
     },
     {
       "word": "大跌",
-      "count": 34
-    },
-    {
-      "word": "调整",
-      "count": 23
-    },
-    {
-      "word": "暴跌",
       "count": 13
     },
     {
-      "word": "重挫",
-      "count": 12
+      "word": "下跌",
+      "count": 9
     },
     {
-      "word": "回调",
-      "count": 11
-    },
-    {
-      "word": "量化跌幅",
-      "count": 10
-    },
-    {
-      "word": "杀跌",
-      "count": 10
-    },
-    {
-      "word": "跌停",
+      "word": "冲高回落",
       "count": 8
     },
     {
-      "word": "跳水",
+      "word": "调整",
       "count": 7
     },
     {
-      "word": "熊市",
-      "count": 6
-    },
-    {
       "word": "新低",
-      "count": 6
+      "count": 5
     },
     {
-      "word": "崩了",
-      "count": 6
+      "word": "暴跌",
+      "count": 5
     },
     {
-      "word": "领跌",
-      "count": 6
+      "word": "减仓",
+      "count": 5
     },
     {
-      "word": "大阴线",
-      "count": 6
+      "word": "谨慎",
+      "count": 5
+    },
+    {
+      "word": "高开低走",
+      "count": 4
+    },
+    {
+      "word": "跳水",
+      "count": 4
+    },
+    {
+      "word": "收跌",
+      "count": 3
+    },
+    {
+      "word": "讽-涨",
+      "count": 3
+    },
+    {
+      "word": "清仓",
+      "count": 3
+    },
+    {
+      "word": "跌停",
+      "count": 3
     }
   ],
   "daily_trends": [
@@ -773,31 +775,11 @@
     },
     {
       "date": "2026-09-29",
-      "sentiment_score": 0.5506,
-      "count": 5000
+      "sentiment_score": 0.6922,
+      "count": 426
     }
   ],
   "hourly_trends": [
-    {
-      "time": "2026-07-29 11:00",
-      "sentiment_score": -0.0372,
-      "count": 880
-    },
-    {
-      "time": "2026-07-29 12:00",
-      "sentiment_score": -0.2137,
-      "count": 304
-    },
-    {
-      "time": "2026-07-30 01:00",
-      "sentiment_score": 0.0024,
-      "count": 1245
-    },
-    {
-      "time": "2026-07-30 02:00",
-      "sentiment_score": -0.0422,
-      "count": 1498
-    },
     {
       "time": "2026-07-30 03:00",
       "sentiment_score": 0.2552,
@@ -4314,44 +4296,64 @@
       "count": 87
     },
     {
+      "time": "2026-09-29 01:00",
+      "sentiment_score": 0.9223,
+      "count": 22
+    },
+    {
+      "time": "2026-09-29 02:00",
+      "sentiment_score": 0.5105,
+      "count": 17
+    },
+    {
+      "time": "2026-09-29 03:00",
+      "sentiment_score": 0.0296,
+      "count": 35
+    },
+    {
+      "time": "2026-09-29 04:00",
+      "sentiment_score": 0.2493,
+      "count": 24
+    },
+    {
       "time": "2026-09-29 05:00",
-      "sentiment_score": -0.9375,
-      "count": 18
+      "sentiment_score": -0.1489,
+      "count": 40
     },
     {
       "time": "2026-09-29 06:00",
-      "sentiment_score": -0.6462,
-      "count": 42
+      "sentiment_score": 0.0478,
+      "count": 33
     },
     {
       "time": "2026-09-29 07:00",
-      "sentiment_score": -0.3359,
-      "count": 73
+      "sentiment_score": -0.2242,
+      "count": 42
     },
     {
       "time": "2026-09-29 08:00",
-      "sentiment_score": -0.1293,
-      "count": 174
+      "sentiment_score": 0.349,
+      "count": 48
     },
     {
       "time": "2026-09-29 09:00",
-      "sentiment_score": -0.0657,
-      "count": 828
+      "sentiment_score": 0.1876,
+      "count": 61
     },
     {
       "time": "2026-09-29 10:00",
-      "sentiment_score": -0.278,
-      "count": 934
+      "sentiment_score": -0.2423,
+      "count": 32
     },
     {
       "time": "2026-09-29 11:00",
-      "sentiment_score": 0.9485,
-      "count": 543
+      "sentiment_score": 0.9884,
+      "count": 42
     },
     {
       "time": "2026-09-29 12:00",
-      "sentiment_score": 0.2113,
-      "count": 119
+      "sentiment_score": 0.085,
+      "count": 30
     },
     {
       "time": "2026-09-29 13:00",
@@ -4380,7 +4382,7 @@
     }
   ],
   "risk": {
-    "total_score": 28.8,
+    "total_score": 84.6,
     "structure_score": 8.1,
     "breakdown_score": 50.0,
     "bull_trend": false,
@@ -4411,9 +4413,9 @@
       }
     ],
     "hard_triggers": [],
-    "level": "⛔ 极端",
-    "advice": "破位风险极高，建议大幅减仓/对冲",
-    "trade_date": "2026-09-29",
+    "level": "🚀 亢奋",
+    "advice": "市场情绪过热，注意保护利润、防守减仓",
+    "trade_date": "2026-09-30",
     "dimensions": {
       "concentration": {
         "score": 0,
@@ -4462,10 +4464,10 @@
         }
       },
       "sentiment": {
-        "score": 28.8,
-        "value": -0.4235,
+        "score": 84.6,
+        "value": 0.6922,
         "label": "论坛情绪(昨日窗口)",
-        "detail": "昨日情绪分 -0.4235",
+        "detail": "昨日情绪分 0.6922",
         "thresholds": {
           "warning": 0.3,
           "danger": 0.5
