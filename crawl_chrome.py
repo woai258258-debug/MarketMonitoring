@@ -174,10 +174,13 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=300):
                 stopped = True
                 break
             if page_new == 0:
-                no_new_streak += 1
-                if no_new_streak >= 5:
-                    print(f"[抓取] 连续 {no_new_streak} 页无新增，提前停止（防循环）")
-                    break
+                # 只有已翻到窗口边界内（最早时间 < end_dt）才认为可能循环；
+                # 整页仍在窗口未来区（如早晨抓取时 9/30 早盘帖）则继续翻页
+                if page_dts and min(page_dts) < end_dt:
+                    no_new_streak += 1
+                    if no_new_streak >= 5:
+                        print(f"[抓取] 连续 {no_new_streak} 页无新增，提前停止（防循环）")
+                        break
             else:
                 no_new_streak = 0
             print(f"[抓取] page {page_no}: 新增 {page_new}，累计 {len(results)}，"

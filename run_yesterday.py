@@ -129,8 +129,8 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
     else:
         lvl, adv = "➖ 中性", "情绪中性，维持当前策略不动"
     risk = data.setdefault("risk", {})
-    # v3.2: 清理旧行情信号（避免与当日 limit_stats 矛盾），保留其他市场结构维度
-    for k in ["signals", "hard_triggers"]:
+    # v3.3: 清理旧行情信号与降级标记（避免与当日 limit_stats 矛盾），保留其他市场结构维度
+    for k in ["signals", "hard_triggers", "source_note"]:
         risk.pop(k, None)
     risk["trade_date"] = day_start.strftime("%Y-%m-%d")  # v3: 修正为分析日
     risk["level"] = lvl
