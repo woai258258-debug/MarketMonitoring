@@ -33,7 +33,7 @@ jobs:
       - name: 安装依赖
         run: |
           python -m pip install --upgrade pip
-          pip install jieba requests
+          pip install jieba requests akshare playwright
           sudo apt-get update -y && sudo apt-get install -y curl 2>/dev/null || true
 
       - name: 抓取昨日数据 + 情绪分析 + 更新看板

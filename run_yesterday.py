@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-run_yesterday.py — 每天定时跑"前一天全天"数据（GitHub Actions 用）v2
-v2 改进（抗风控降级）：
-  - 抓取被东财风控拦截/0 帖时，若 data.json 已有该日历史数据：
-    重建看板 + 更新 risk 日期 → 正常退出 0（保证 Pages 每天有内容），打印明显警告
-  - 无任何该日数据才返回 2（此时看板保留旧数据，次日自动重试）
+run_yesterday.py — 每天定时跑"前一天全天"数据（GitHub Actions 用）v3
+v3 修复（针对 9/29 数据错误）：
+  1. 抓取通道 v4：Playwright + 系统 Chrome（替换 curl 直连）——curl 无 cookie 会话翻页
+     超过 ~35 页后列表循环乱序，导致 9/29 下午晚上整段缺失；浏览器通道时间倒序连续。
+  2. 涨停/跌停/炸板：改用 AKShare 免费接口（stock_zt_pool_em / dtgc / zbgc），
+     按分析日写入 risk.limit_stats —— 此前看板沿用旧日期行情数据导致"涨停/跌停错误"。
+  3. risk.trade_date 修正为分析日（day_start），此前误写为窗口末（次日上午）。
 
 流程：
-  1. 直连东财股吧，抓取 [昨天 00:00, 今天 00:00) 窗口帖子
-  2. 情绪分析（sentiment_analyzer 增强版）
-  3. 合并历史 → data.json / posts.json → 生成看板 index.html
-  4. 打印报告（情绪指数/恐慌占比/TOP 词/高热度帖）
+  1. Playwright+Chrome 抓取东财股吧 [昨天 00:00, 今天 00:00) 窗口帖子
+  2. 情绪分析（sentiment_analyzer 增强版 + 合并词库）
+  3. AKShare 拉当日涨停/跌停/炸板 → risk.limit_stats
+  4. 合并历史 → data.json / posts.json → 生成看板 index.html
+  5. 打印报告
 
-用法: python3 run_yesterday.py [--date YYYY-MM-DD]
+用法: python3 run_yesterday.py [--date YYYY-MM-DD] [--posts x.json]
 """
 import argparse
 import json
@@ -24,7 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-from crawl_recent import crawl_window_requests, parse_number
+from crawl_chrome import crawl_window_requests, parse_number
 from sentiment_analyzer import SentimentAnalyzer
 from data_store import save_bundle
 from dashboard_generator import DashboardGenerator
@@ -43,6 +46,32 @@ def normalize_posts(posts):
 def load_raw(path):
     posts = json.load(open(path, encoding="utf-8"))
     return normalize_posts(posts)
+
+
+def fetch_limit_stats(date_str):
+    """AKShare 拉指定交易日涨停/跌停/炸板 → limit_stats dict（失败返回 None）
+    date_str: 'YYYY-MM-DD'（如 2026-09-29）
+    """
+    ds = date_str.replace("-", "")
+    try:
+        import akshare as ak
+    except ImportError:
+        print("[行情] akshare 未安装，跳过涨停/跌停")
+        return None
+    try:
+        zt = ak.stock_zt_pool_em(date=ds)
+        down = ak.stock_zt_pool_dtgc_em(date=ds)
+        zb = ak.stock_zt_pool_zbgc_em(date=ds)
+        up = int(len(zt) or 0)
+        dn = int(len(down) or 0)
+        bust = int(len(zb) or 0)
+        bust_rate = round(bust / (up + bust), 4) if (up + bust) else 0.0
+        stats = {"up": up, "down": dn, "bust": bust, "bust_rate": bust_rate, "date": date_str}
+        print(f"[行情] AKShare 涨停 {up} / 跌停 {dn} / 炸板 {bust}（{date_str}）")
+        return stats
+    except Exception as e:
+        print(f"[行情] AKShare 获取失败: {type(e).__name__}: {str(e)[:200]}")
+        return None
 
 
 def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_path, config_path):
@@ -100,7 +129,7 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
     else:
         lvl, adv = "➖ 中性", "情绪中性，维持当前策略不动"
     risk = data.setdefault("risk", {})
-    risk["trade_date"] = day_end.strftime("%Y-%m-%d")
+    risk["trade_date"] = day_start.strftime("%Y-%m-%d")  # v3: 修正为分析日
     risk["level"] = lvl
     risk["advice"] = adv
     risk["total_score"] = round(50 + sc * 50, 1)
@@ -112,6 +141,11 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
         "detail": f"昨日情绪分 {sc:.4f}",
         "thresholds": {"warning": 0.3, "danger": 0.5},
     }
+
+    # v3: AKShare 涨停/跌停/炸板 → limit_stats
+    ls = fetch_limit_stats(day_start.strftime("%Y-%m-%d"))
+    if ls:
+        risk["limit_stats"] = ls
 
     save_bundle(data, str(data_path))
     gen = DashboardGenerator(data_path=str(data_path), config_path=str(config_path))
@@ -128,9 +162,9 @@ def degrade_with_existing(data_path, index_path, day_start, day_end):
     has_day = any(d.get("date") == day_str for d in data.get("daily_trends", []))
     if not has_day:
         return False
-    # 更新 risk trade_date 为当日窗口末
+    # 更新 risk trade_date 为分析日
     risk = data.setdefault("risk", {})
-    risk["trade_date"] = day_end.strftime("%Y-%m-%d")
+    risk["trade_date"] = day_str
     risk["source_note"] = "抓取被风控拦截，本次使用已有历史数据重建看板（数据非最新抓取）"
     try:
         save_bundle(data, str(data_path))
@@ -205,7 +239,7 @@ def main():
             # 部分数据：拦截前已抓到足够帖子，用真实数据分析（半程数据）
             print(f"[警告] 抓取被风控拦截，但已获得 {len(posts)} 条部分数据，继续分析")
         elif meta.get("intercepted"):
-            print("[失败] 直连被东财反爬拦截（验证页）且数据不足")
+            print("[失败] Playwright/Chrome 通道不可用且数据不足")
             if degrade_with_existing(data_path, index_path, day_start, day_end):
                 print("[降级完成] 看板已用历史数据重建，流程正常结束")
                 return 0
