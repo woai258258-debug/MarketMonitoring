@@ -110,6 +110,26 @@ def _find_chrome():
     return None
 
 
+def _load_page(page, url):
+    """加载单页并提取行；3 轮 × 3 次尝试，轮间长退避 60s（抗翻页限流）"""
+    from playwright.sync_api import TimeoutError as PWTimeout
+    for round_i in range(3):
+        for attempt in range(3):
+            try:
+                page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                page.wait_for_selector("table tbody tr", timeout=30000)
+                rows = page.evaluate(EXTRACT_JS)
+                if rows:
+                    return rows
+                print(f"    [诊断] 页面无表格行，url={page.url()[:90]!r} title={page.title()[:40]!r}")
+            except Exception as e:
+                print(f"    [诊断] 失败 {type(e).__name__}: {str(e)[:80]} url={page.url()[:90]!r}")
+                time.sleep(5 + random.random() * 5)
+        print(f"    第 {round_i + 1} 轮失败，长退避 60s 后重试")
+        time.sleep(60)
+    return None
+
+
 def crawl_window_requests(cutoff, end_dt=None, max_pages=300):
     """Playwright 翻页抓取 [cutoff, end_dt] 窗口；页内最早时间 < cutoff 即停"""
     from playwright.sync_api import sync_playwright
@@ -127,19 +147,9 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=300):
         no_new_streak = 0
         for page_no in range(1, max_pages + 1):
             url = GUBA_LIST_URL.format(page=page_no)
-            rows = None
-            for attempt in range(3):
-                try:
-                    page.goto(url, wait_until="domcontentloaded", timeout=30000)
-                    page.wait_for_selector("table tbody tr", timeout=15000)
-                    rows = page.evaluate(EXTRACT_JS)
-                    if rows:
-                        break
-                except Exception as e:
-                    print(f"[抓取] page {page_no}: 第{attempt + 1}次失败 {str(e)[:100]}")
-                    time.sleep(2 + random.random() * 2)
+            rows = _load_page(page, url)
             if not rows:
-                print(f"[抓取] page {page_no}: 重试后仍无行，停止")
+                print(f"[抓取] page {page_no}: 多轮重试仍失败，停止")
                 break
             page_dts, page_new = [], 0
             for r in rows:
@@ -172,7 +182,7 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=300):
                 no_new_streak = 0
             print(f"[抓取] page {page_no}: 新增 {page_new}，累计 {len(results)}，"
                   f"最早 {min(page_dts).strftime('%m-%d %H:%M') if page_dts else '-'}")
-            time.sleep(0.4 + random.random() * 0.8)
+            time.sleep(0.8 + random.random() * 0.8)
         browser.close()
     print(f"[抓取] 完成: {len(results)} 条, stopped={stopped}")
     return results, {"stopped": stopped, "intercepted": False}
