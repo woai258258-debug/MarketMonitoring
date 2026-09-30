@@ -129,23 +129,21 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
     else:
         lvl, adv = "➖ 中性", "情绪中性，维持当前策略不动"
     risk = data.setdefault("risk", {})
-    # v3.1: 清除历史 risk_scorer 遗留的旧信号/维度（旧日期行情会与当日 limit_stats 矛盾）
-    for k in ["signals", "hard_triggers", "structure_score", "breakdown_score", "bull_trend",
-              "bull_trend_detail", "aftershock", "distribution_leading", "distribution_patterns",
-              "base_score", "momentum_bonus", "accumulation_bonus", "floor_score",
-              "structure_floor", "breakdown_floor", "snapshot_score", "source_note"]:
+    # v3.2: 清理旧行情信号（避免与当日 limit_stats 矛盾），保留其他市场结构维度
+    for k in ["signals", "hard_triggers"]:
         risk.pop(k, None)
     risk["trade_date"] = day_start.strftime("%Y-%m-%d")  # v3: 修正为分析日
     risk["level"] = lvl
     risk["advice"] = adv
     risk["total_score"] = round(50 + sc * 50, 1)
-    risk["dimensions"] = {"sentiment": {  # 只保留本次分析产生的维度
+    risk["dimensions"] = risk.get("dimensions") or {}
+    risk["dimensions"]["sentiment"] = {
         "score": round(max(0, min(100, 50 + sc * 50)), 1),
         "value": round(sc, 4),
         "label": "论坛情绪(昨日窗口)",
         "detail": f"昨日情绪分 {sc:.4f}",
         "thresholds": {"warning": 0.3, "danger": 0.5},
-    }}
+    }
 
     # v3: AKShare 涨停/跌停/炸板 → limit_stats
     ls = fetch_limit_stats(day_start.strftime("%Y-%m-%d"))
