@@ -14,4 +14,4 @@ jobs:
         with:
           python-version: "3.11"
       - name: 探测东财接口
-        run: python probe_eastmoney.py
+        run: python probe2.py
