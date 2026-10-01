@@ -9,7 +9,7 @@
     "neutral_posts": 2674,
     "sentiment_participation": 0.4288,
     "panic_ratio": 0.6552,
-    "last_updated": "2026-10-01 23:27:41",
+    "last_updated": "2026-10-01 23:41:43",
     "sources_used": [
       "eastmoney"
     ],
@@ -4287,12 +4287,12 @@
     },
     {
       "time": "2026-09-30 04:00",
-      "sentiment_score": -0.2096,
+      "sentiment_score": -0.2097,
       "count": 4
     },
     {
       "time": "2026-09-30 05:00",
-      "sentiment_score": 0.1706,
+      "sentiment_score": 0.1707,
       "count": 18
     },
     {
@@ -4347,7 +4347,7 @@
     },
     {
       "time": "2026-09-30 16:00",
-      "sentiment_score": 0.0362,
+      "sentiment_score": 0.0363,
       "count": 77
     },
     {
@@ -4362,12 +4362,12 @@
     },
     {
       "time": "2026-09-30 19:00",
-      "sentiment_score": -0.0659,
+      "sentiment_score": -0.0657,
       "count": 35
     },
     {
       "time": "2026-09-30 20:00",
-      "sentiment_score": -0.1115,
+      "sentiment_score": -0.1112,
       "count": 27
     },
     {
