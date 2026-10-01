@@ -599,18 +599,26 @@ class DashboardGenerator:
                 </div>
                 <div class="mt-3 pt-3 border-t border-gray-800/60">
                     <h4 class="text-gray-500 text-[10px] font-semibold uppercase tracking-wider mb-2">模型说明</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
-                        <div class="flex items-start gap-1.5 bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-2.5 py-2">
-                            <span class="text-emerald-400 font-bold shrink-0">&lt; -0.3</span>
-                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">极度恐慌 / 黄金买点</span><br>逆向建仓 +10%~+20%</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 text-[11px]">
+                        <div class="flex items-start gap-1 bg-emerald-500/5 border border-emerald-500/10 rounded-lg px-2 py-1.5">
+                            <span class="text-emerald-400 font-bold shrink-0">&lt;-0.3</span>
+                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">极度恐慌</span><br>逆向建仓 +10~20%</span>
                         </div>
-                        <div class="flex items-start gap-1.5 bg-gray-800/20 border border-gray-700/20 rounded-lg px-2.5 py-2">
-                            <span class="text-gray-400 font-bold shrink-0">-0.3~0.5</span>
-                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">情绪中性 / 卧倒装死</span><br>维持底仓，持股不动</span>
+                        <div class="flex items-start gap-1 bg-amber-500/5 border border-amber-500/10 rounded-lg px-2 py-1.5">
+                            <span class="text-amber-400 font-bold shrink-0">-0.3~-0.1</span>
+                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">偏悲观</span><br>控制仓位</span>
                         </div>
-                        <div class="flex items-start gap-1.5 bg-red-500/5 border border-red-500/10 rounded-lg px-2.5 py-2">
-                            <span class="text-red-400 font-bold shrink-0">&gt; +0.5</span>
-                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">极度亢奋 / 防御警报</span><br>防守减仓 -10%~-20%</span>
+                        <div class="flex items-start gap-1 bg-gray-800/20 border border-gray-700/20 rounded-lg px-2 py-1.5">
+                            <span class="text-gray-400 font-bold shrink-0">-0.1~0.1</span>
+                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">中性</span><br>持股不动</span>
+                        </div>
+                        <div class="flex items-start gap-1 bg-indigo-500/5 border border-indigo-500/10 rounded-lg px-2 py-1.5">
+                            <span class="text-indigo-400 font-bold shrink-0">0.1~0.5</span>
+                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">偏乐观</span><br>顺势持有</span>
+                        </div>
+                        <div class="flex items-start gap-1 bg-red-500/5 border border-red-500/10 rounded-lg px-2 py-1.5">
+                            <span class="text-red-400 font-bold shrink-0">&gt;0.5</span>
+                            <span class="text-gray-300 leading-snug"><span class="text-white font-semibold">极度亢奋</span><br>防守减仓 -10~20%</span>
                         </div>
                     </div>
                 </div>
@@ -861,6 +869,22 @@ class DashboardGenerator:
                 recBox.className = "w-full text-center py-2.5 px-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-red-400 bearish-glow";
                 recLabel.innerHTML = `<i class="fa-solid fa-circle-arrow-down"></i> 极度乐观 / 防御警报`;
                 recDetails.textContent = "市场风险极高，注意保护利润，建议防守防御，减仓 -10% ~ -20% 并收缩战线。";
+            }} else if (score >= 0.1) {{
+                // Mildly Bullish
+                card.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.15)";
+                bgGlow.className = "absolute -right-20 -top-20 w-40 h-40 rounded-full bg-emerald-500/10 blur-3xl";
+                
+                recBox.className = "w-full text-center py-2.5 px-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400";
+                recLabel.innerHTML = `<i class="fa-solid fa-circle-arrow-up"></i> 偏乐观 / 顺势持有`;
+                recDetails.textContent = "情绪偏乐观，可维持仓位、顺势持有。";
+            }} else if (score <= -0.1) {{
+                // Mildly Bearish
+                card.style.boxShadow = "0 0 20px rgba(245, 158, 11, 0.15)";
+                bgGlow.className = "absolute -right-20 -top-20 w-40 h-40 rounded-full bg-amber-500/10 blur-3xl";
+                
+                recBox.className = "w-full text-center py-2.5 px-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400";
+                recLabel.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> 偏悲观 / 预警`;
+                recDetails.textContent = "情绪偏悲观，控制仓位、观察企稳。";
             }} else {{
                 // Neutral
                 card.style.boxShadow = "0 0 20px rgba(99, 102, 241, 0.15)";
