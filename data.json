@@ -269,11 +269,6 @@
   ],
   "daily_trends": [
     {
-      "date": "2026-06-19",
-      "sentiment_score": 0.0782,
-      "count": 528
-    },
-    {
       "date": "2026-06-20",
       "sentiment_score": 0.0228,
       "count": 348
@@ -297,11 +292,6 @@
       "date": "2026-06-24",
       "sentiment_score": 0.2021,
       "count": 6337
-    },
-    {
-      "date": "2026-06-25",
-      "sentiment_score": -0.0641,
-      "count": 728
     },
     {
       "date": "2026-06-26",
@@ -629,16 +619,6 @@
       "count": 465
     },
     {
-      "date": "2026-08-31",
-      "sentiment_score": -0.113,
-      "count": 430
-    },
-    {
-      "date": "2026-09-01",
-      "sentiment_score": -0.1286,
-      "count": 434
-    },
-    {
       "date": "2026-09-02",
       "sentiment_score": -0.3283,
       "count": 1479
@@ -647,11 +627,6 @@
       "date": "2026-09-03",
       "sentiment_score": 0.0501,
       "count": 5446
-    },
-    {
-      "date": "2026-09-04",
-      "sentiment_score": 0.0387,
-      "count": 891
     },
     {
       "date": "2026-09-05",
@@ -754,11 +729,6 @@
       "count": 6343
     },
     {
-      "date": "2026-09-25",
-      "sentiment_score": 0.0722,
-      "count": 463
-    },
-    {
       "date": "2026-09-26",
       "sentiment_score": 0.3837,
       "count": 306
@@ -769,11 +739,6 @@
       "count": 338
     },
     {
-      "date": "2026-09-28",
-      "sentiment_score": -0.4235,
-      "count": 249
-    },
-    {
       "date": "2026-09-29",
       "sentiment_score": 0.4599,
       "count": 5440
@@ -782,11 +747,6 @@
       "date": "2026-09-30",
       "sentiment_score": -0.229,
       "count": 4680
-    },
-    {
-      "date": "2026-10-01",
-      "sentiment_score": 0.0,
-      "count": 1
     }
   ],
   "hourly_trends": [
@@ -4393,11 +4353,6 @@
   ],
   "risk": {
     "total_score": 38.5,
-    "structure_score": 8.1,
-    "breakdown_score": 50.0,
-    "bull_trend": false,
-    "bull_trend_detail": "MA10未高于MA20",
-    "aftershock": false,
     "limit_stats": {
       "up": 52,
       "down": 9,
@@ -4405,65 +4360,10 @@
       "bust_rate": 0.1875,
       "date": "2026-09-30"
     },
-    "distribution_leading": false,
-    "distribution_patterns": [],
-    "base_score": 52.5,
-    "momentum_bonus": 0,
-    "accumulation_bonus": 0.0,
-    "floor_score": 0.0,
-    "structure_floor": 0.0,
-    "breakdown_floor": 0.0,
-    "snapshot_score": 52.5,
     "level": "⚠️ 预警",
     "advice": "情绪偏悲观，控制仓位、观察企稳",
     "trade_date": "2026-09-30",
     "dimensions": {
-      "concentration": {
-        "score": 0,
-        "value": 43.85,
-        "label": "资金集中度",
-        "detail": "前5%个股成交额占全市场 43.85%",
-        "thresholds": {
-          "warning": 50,
-          "danger": 52
-        },
-        "historical_max": 54.22,
-        "historical_max_date": "20260709",
-        "historical_min": 39.52,
-        "historical_median": 44.53,
-        "historical_percentile": 43.1,
-        "sample_count": 51
-      },
-      "margin": {
-        "score": 10,
-        "value": null,
-        "label": "融资余额占比",
-        "detail": "融资数据暂无（取中位分）",
-        "thresholds": {
-          "warning": 2.5,
-          "danger": 3.0
-        }
-      },
-      "industry": {
-        "score": 13.5,
-        "value": 34.75,
-        "label": "行业集中度",
-        "detail": "通信+电子成交占全市场 34.75%",
-        "thresholds": {
-          "warning": 30,
-          "danger": 40
-        }
-      },
-      "market_stress": {
-        "score": 20.0,
-        "value": 15.46,
-        "label": "恐慌扩散",
-        "detail": "跌幅≥5%个股占比 15.46%",
-        "thresholds": {
-          "warning": 8,
-          "danger": 12
-        }
-      },
       "sentiment": {
         "score": 38.5,
         "value": -0.229,

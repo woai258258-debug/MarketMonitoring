@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-run_yesterday.py — 每天定时跑"前一天全天"数据（GitHub Actions 用）v3
+run_yesterday.py — 每天定时跑"前一天全天"数据（GitHub Actions 用）v5
+v5（2026-10-01 全面复核修复）：
+  1. 日期基准改 beijing_time.now_beijing()（ZoneInfo 硬编码，不依赖 TZ 环境变量）
+  2. daily_trends 合并后过滤 > scan_date 的未来日期（防止次日 00:00 边缘帖子污染日线）
+  3. 清除旧日期遗留风险字段（structure_score/breakdown_score/信号/触发等来自旧交易日
+     的 TuShare 数据）与旧维度（concentration/margin/industry/market_stress），
+     风险面板只展示当日 sentiment 折算结果 + 当日 AKShare 涨停/跌停/炸板
 v3 修复（针对 9/29 数据错误）：
   1. 抓取通道 v4：Playwright + 系统 Chrome（替换 curl 直连）——curl 无 cookie 会话翻页
      超过 ~35 页后列表循环乱序，导致 9/29 下午晚上整段缺失；浏览器通道时间倒序连续。
@@ -31,6 +37,7 @@ from crawl_chrome import crawl_window_requests, parse_number
 from sentiment_analyzer import SentimentAnalyzer
 from data_store import save_bundle
 from dashboard_generator import DashboardGenerator
+from beijing_time import now_beijing
 
 
 def normalize_posts(posts):
@@ -98,7 +105,9 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
     for d in sorted(new_daily.keys()):
         merged.append(new_daily[d])
     merged.sort(key=lambda x: x["date"])
-    data["daily_trends"] = merged
+    # v5: 过滤掉晚于分析日的日期（次日 00:00 边缘帖子不入日线）
+    scan_str = s["scan_date"]
+    data["daily_trends"] = [d for d in merged if d["date"] <= scan_str]
 
     new_hourly = {h["time"]: h for h in res["hourly_trends"]}
     merged_h = []
@@ -129,14 +138,19 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
     else:
         lvl, adv = "➖ 中性", "情绪中性，维持当前策略不动"
     risk = data.setdefault("risk", {})
-    # v3.3: 清理旧行情信号与降级标记（避免与当日 limit_stats 矛盾），保留其他市场结构维度
-    for k in ["signals", "hard_triggers", "source_note"]:
+    # v5: 清除所有来自旧交易日的风险字段（TuShare 时代遗留，日期错位会造成看板数字矛盾）
+    #     风险面板只保留：当日 sentiment 折算 + 当日 AKShare 涨停/跌停/炸板
+    for k in ["structure_score", "breakdown_score", "bull_trend", "bull_trend_detail",
+              "aftershock", "base_score", "momentum_bonus", "accumulation_bonus",
+              "floor_score", "structure_floor", "breakdown_floor", "snapshot_score",
+              "distribution_leading", "distribution_patterns",
+              "signals", "hard_triggers", "source_note"]:
         risk.pop(k, None)
     risk["trade_date"] = day_start.strftime("%Y-%m-%d")  # v3: 修正为分析日
     risk["level"] = lvl
     risk["advice"] = adv
     risk["total_score"] = round(50 + sc * 50, 1)
-    risk["dimensions"] = risk.get("dimensions") or {}
+    risk["dimensions"] = {}  # v5: 不再保留旧日期遗留维度（concentration/margin/industry/market_stress）
     risk["dimensions"]["sentiment"] = {
         "score": round(max(0, min(100, 50 + sc * 50)), 1),
         "value": round(sc, 4),
@@ -218,7 +232,7 @@ def main():
     ap.add_argument("--posts", help="已有抓取 JSON，跳过抓取")
     args = ap.parse_args()
 
-    now = datetime.now()
+    now = now_beijing()
     if args.date:
         day = datetime.strptime(args.date, "%Y-%m-%d")
     else:

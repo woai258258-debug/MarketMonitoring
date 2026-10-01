@@ -164,7 +164,7 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=300):
                 if dt is None:
                     continue
                 page_dts.append(dt)
-                if dt < cutoff or dt > end_dt:
+                if dt < cutoff or dt >= end_dt:  # v5: 次日 00:00 归属次日，不入当日窗口
                     continue
                 key = r.get("post_id") or (r.get("title", "") + r.get("author", ""))
                 if key in seen:

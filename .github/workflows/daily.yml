@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 17 * * *'   # 每天 17:00 UTC = 北京时间凌晨 01:00
   workflow_dispatch:        # 支持手动触发
+    inputs:
+      date:
+        description: '补跑指定日期 YYYY-MM-DD（留空默认抓昨天）'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -37,7 +42,12 @@ jobs:
           sudo apt-get update -y && sudo apt-get install -y curl 2>/dev/null || true
 
       - name: 抓取昨日数据 + 情绪分析 + 更新看板
-        run: python run_yesterday.py
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python run_yesterday.py --date "${{ github.event.inputs.date }}"
+          else
+            python run_yesterday.py
+          fi
         env:
           PYTHONIOENCODING: utf-8
           TZ: Asia/Shanghai
