@@ -111,20 +111,27 @@ def _find_chrome():
 
 
 def _load_page(page, url):
-    """加载单页并提取行；3 轮 × 3 次尝试，轮间长退避 60s（抗翻页限流）"""
-    from playwright.sync_api import TimeoutError as PWTimeout
+    """加载单页并提取行；3 轮 × 3 次尝试，轮间长退避 60s（抗翻页限流）。
+    注意：不使用 page.wait_for_selector —— Playwright 1.63 在超时转写错误时
+    存在 'str' object is not callable 的内部 TypeError bug，改为 evaluate 轮询。"""
     for round_i in range(3):
         for attempt in range(3):
             try:
-                page.goto(url, wait_until="domcontentloaded", timeout=30000)
-                page.wait_for_selector("table tbody tr", timeout=30000)
-                rows = page.evaluate(EXTRACT_JS)
+                page.goto(url, wait_until="domcontentloaded", timeout=45000)
+            except Exception as e:
+                print(f"    [诊断] goto失败 {type(e).__name__}: {str(e)[:80]} url={page.url()[:90]!r}")
+                time.sleep(5 + random.random() * 5)
+                continue
+            rows = None
+            for _ in range(30):  # 轮询最多 ~30s 等表格渲染
+                try:
+                    rows = page.evaluate(EXTRACT_JS)
+                except Exception:
+                    rows = None
                 if rows:
                     return rows
-                print(f"    [诊断] 页面无表格行，url={page.url()[:90]!r} title={page.title()[:40]!r}")
-            except Exception as e:
-                print(f"    [诊断] 失败 {type(e).__name__}: {str(e)[:80]} url={page.url()[:90]!r}")
-                time.sleep(5 + random.random() * 5)
+                time.sleep(1)
+            print(f"    [诊断] 页面无表格行，url={page.url()[:90]!r} title={page.title()[:40]!r}")
         print(f"    第 {round_i + 1} 轮失败，长退避 60s 后重试")
         time.sleep(60)
     return None
@@ -185,7 +192,11 @@ def crawl_window_requests(cutoff, end_dt=None, max_pages=300):
                 no_new_streak = 0
             print(f"[抓取] page {page_no}: 新增 {page_new}，累计 {len(results)}，"
                   f"最早 {min(page_dts).strftime('%m-%d %H:%M') if page_dts else '-'}")
-            time.sleep(0.8 + random.random() * 0.8)
+            # 限流防护：翻页间隔随机化；每 20 页长退避 30s
+            time.sleep(1.5 + random.random() * 1.5)
+            if page_no % 20 == 0:
+                print(f"[抓取] 连续翻页 {page_no} 页，长退避 30s 防风控")
+                time.sleep(30)
         browser.close()
     print(f"[抓取] 完成: {len(results)} 条, stopped={stopped}")
     return results, {"stopped": stopped, "intercepted": False}

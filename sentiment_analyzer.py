@@ -1,5 +1,6 @@
 import json
 import re
+import math
 import os
 from datetime import datetime
 
@@ -429,7 +430,11 @@ class SentimentAnalyzer:
             
             # 5. Calculate final weights
             read_count = post.get("read_count", 0)
-            raw_weight = read_count + 1
+            # v4: 权重修复 —— 原 (read_count+1) 线性权重让个别高阅读帖
+            # （5993读→w=5845）主导全天指数（普通帖 w≈7，差 500 倍），
+            # 情绪被极少数热帖绑架。改用 log2 压缩：5993读→13.5，36读→6.2。
+            read_weight = math.log2(read_count + 1) + 1.0
+            raw_weight = read_weight
             final_weight = raw_weight * spammer_penalty * time_decay
             # 中性帖降权：无情绪帖占比常超 70%，会稀释情绪指数（恐慌/亢奋日判定失效的根因）
             neutral_discount = 1.0
