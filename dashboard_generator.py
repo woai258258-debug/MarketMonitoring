@@ -88,13 +88,14 @@ class DashboardGenerator:
             and conc_hist_max is not None
             and conc_value > conc_hist_max
         )
-        conc_score = (risk or {}).get("dimensions", {}).get("concentration", {}).get("score", 0)
+        conc_dim = (risk or {}).get("dimensions", {}).get("concentration") or {}
+        conc_score = conc_dim.get("score") if isinstance(conc_dim, dict) else None
         conc_subline = (
             f'历史极值 {conc_hist_display}% · 当前 {conc_score} 分'
             if risk and conc_hist_max is not None
             else (
                 f'当前评分 {conc_score} 分'
-                if risk
+                if risk and conc_score is not None
                 else ""
             )
         )
