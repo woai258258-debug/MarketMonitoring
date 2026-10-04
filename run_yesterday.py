@@ -55,6 +55,17 @@ def load_raw(path):
     return normalize_posts(posts)
 
 
+def is_trade_day(date_str):
+    """判断是否交易日（AKShare 交易日历）；日历拉取失败时默认 True 不阻断"""
+    try:
+        import akshare as ak
+        cal = ak.tool_trade_date_hist_sina()
+        ds = date_str.replace("-", "")
+        return any(str(x).replace("-", "") == ds for x in cal["trade_date"])
+    except Exception:
+        return True
+
+
 def fetch_limit_stats(date_str):
     """AKShare 拉指定交易日涨停/跌停/炸板 → limit_stats dict（失败返回 None）
     date_str: 'YYYY-MM-DD'（如 2026-09-29）
@@ -159,10 +170,14 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
         "thresholds": {"warning": 0.3, "danger": 0.5},
     }
 
-    # v3: AKShare 涨停/跌停/炸板 → limit_stats
-    ls = fetch_limit_stats(day_start.strftime("%Y-%m-%d"))
-    if ls:
-        risk["limit_stats"] = ls
+    # v3: AKShare 涨停/跌停/炸板 → limit_stats（v5.3: 仅交易日拉取，非交易日移除避免显示兜底旧数据）
+    if is_trade_day(day_start.strftime("%Y-%m-%d")):
+        ls = fetch_limit_stats(day_start.strftime("%Y-%m-%d"))
+        if ls:
+            risk["limit_stats"] = ls
+    else:
+        risk.pop("limit_stats", None)
+        print(f"[行情] {day_start.strftime('%Y-%m-%d')} 非交易日，跳过涨停/跌停")
 
     save_bundle(data, str(data_path))
     gen = DashboardGenerator(data_path=str(data_path), config_path=str(config_path))
