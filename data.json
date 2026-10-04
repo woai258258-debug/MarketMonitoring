@@ -1,6 +1,6 @@
 {
   "summary": {
-    "overall_weighted_score": -0.0286,
+    "overall_weighted_score": -0.0287,
     "total_posts": 218,
     "valid_posts": 216,
     "spam_posts": 2,
@@ -9,7 +9,7 @@
     "neutral_posts": 139,
     "sentiment_participation": 0.3565,
     "panic_ratio": 0.5455,
-    "last_updated": "2026-10-04 10:47:23",
+    "last_updated": "2026-10-04 10:55:47",
     "sources_used": [
       "eastmoney"
     ],
@@ -750,7 +750,7 @@
     },
     {
       "date": "2026-10-03",
-      "sentiment_score": -0.0286,
+      "sentiment_score": -0.0287,
       "count": 216
     }
   ],
@@ -4267,7 +4267,7 @@
     },
     {
       "time": "2026-10-03 06:00",
-      "sentiment_score": 0.16,
+      "sentiment_score": 0.1601,
       "count": 6
     },
     {
@@ -4282,7 +4282,7 @@
     },
     {
       "time": "2026-10-03 09:00",
-      "sentiment_score": -0.0024,
+      "sentiment_score": -0.0029,
       "count": 18
     },
     {
@@ -4312,7 +4312,7 @@
     },
     {
       "time": "2026-10-03 15:00",
-      "sentiment_score": 0.5548,
+      "sentiment_score": 0.5539,
       "count": 9
     },
     {
@@ -4322,7 +4322,7 @@
     },
     {
       "time": "2026-10-03 17:00",
-      "sentiment_score": 0.0409,
+      "sentiment_score": 0.0415,
       "count": 8
     },
     {
@@ -4332,48 +4332,41 @@
     },
     {
       "time": "2026-10-03 19:00",
-      "sentiment_score": 0.3831,
+      "sentiment_score": 0.383,
       "count": 11
     },
     {
       "time": "2026-10-03 20:00",
-      "sentiment_score": 0.0071,
+      "sentiment_score": 0.0067,
       "count": 9
     },
     {
       "time": "2026-10-03 21:00",
-      "sentiment_score": 0.176,
+      "sentiment_score": 0.1769,
       "count": 11
     },
     {
       "time": "2026-10-03 22:00",
-      "sentiment_score": -0.2297,
+      "sentiment_score": -0.2293,
       "count": 15
     },
     {
       "time": "2026-10-03 23:00",
-      "sentiment_score": -0.4939,
+      "sentiment_score": -0.4944,
       "count": 7
     }
   ],
   "risk": {
     "total_score": 48.6,
-    "limit_stats": {
-      "up": 52,
-      "down": 9,
-      "bust": 12,
-      "bust_rate": 0.1875,
-      "date": "2026-10-03"
-    },
     "level": "➖ 中性",
     "advice": "情绪中性，维持当前策略不动",
     "trade_date": "2026-10-03",
     "dimensions": {
       "sentiment": {
         "score": 48.6,
-        "value": -0.0286,
+        "value": -0.0287,
         "label": "论坛情绪(昨日窗口)",
-        "detail": "昨日情绪分 -0.0286",
+        "detail": "昨日情绪分 -0.0287",
         "thresholds": {
           "warning": 0.3,
           "danger": 0.5
