@@ -37,7 +37,7 @@ from crawl_chrome import crawl_window_requests, parse_number
 from sentiment_analyzer import SentimentAnalyzer
 from data_store import save_bundle
 from dashboard_generator import DashboardGenerator
-from beijing_time import now_beijing
+from beijing_time import now_beijing_naive
 
 
 def normalize_posts(posts):
@@ -232,7 +232,7 @@ def main():
     ap.add_argument("--posts", help="已有抓取 JSON，跳过抓取")
     args = ap.parse_args()
 
-    now = now_beijing()
+    now = now_beijing_naive()  # v5.2: 与爬虫内部 naive datetime 保持一致（修复 aware/naive 比较崩溃）
     if args.date:
         day = datetime.strptime(args.date, "%Y-%m-%d")
     else:
