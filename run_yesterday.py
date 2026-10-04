@@ -55,15 +55,39 @@ def load_raw(path):
     return normalize_posts(posts)
 
 
+_TRADE_CAL = None
+
+
+def _get_trade_cal():
+    """AKShare 交易日历（模块级缓存）；失败返回 []（调用方按交易日处理，不阻断）"""
+    global _TRADE_CAL
+    if _TRADE_CAL is None:
+        try:
+            import akshare as ak
+            cal = ak.tool_trade_date_hist_sina()
+            _TRADE_CAL = sorted(str(x).replace("-", "") for x in cal["trade_date"])
+        except Exception:
+            _TRADE_CAL = []
+    return _TRADE_CAL
+
+
 def is_trade_day(date_str):
-    """判断是否交易日（AKShare 交易日历）；日历拉取失败时默认 True 不阻断"""
-    try:
-        import akshare as ak
-        cal = ak.tool_trade_date_hist_sina()
-        ds = date_str.replace("-", "")
-        return any(str(x).replace("-", "") == ds for x in cal["trade_date"])
-    except Exception:
-        return True
+    """判断是否交易日；日历拉取失败时默认 True 不阻断"""
+    cal = _get_trade_cal()
+    return True if not cal else date_str.replace("-", "") in cal
+
+
+def prev_trade_day(date_str):
+    """返回 date_str 之前最近的交易日（YYYY-MM-DD）；日历失败返回 date_str 本身"""
+    cal = _get_trade_cal()
+    ds = date_str.replace("-", "")
+    if not cal:
+        return date_str
+    prev = [d for d in cal if d < ds]
+    if not prev:
+        return date_str
+    p = prev[-1]
+    return f"{p[:4]}-{p[4:6]}-{p[6:]}" if len(p) == 8 else p
 
 
 def fetch_limit_stats(date_str):
@@ -170,14 +194,15 @@ def analyze_and_build(posts, day_start, day_end, data_path, posts_path, index_pa
         "thresholds": {"warning": 0.3, "danger": 0.5},
     }
 
-    # v3: AKShare 涨停/跌停/炸板 → limit_stats（v5.3: 仅交易日拉取，非交易日移除避免显示兜底旧数据）
-    if is_trade_day(day_start.strftime("%Y-%m-%d")):
-        ls = fetch_limit_stats(day_start.strftime("%Y-%m-%d"))
-        if ls:
-            risk["limit_stats"] = ls
-    else:
-        risk.pop("limit_stats", None)
-        print(f"[行情] {day_start.strftime('%Y-%m-%d')} 非交易日，跳过涨停/跌停")
+    # v5.4: 行情数据日——交易日用当日，非交易日回退上一交易日（行情数据日标注真实数据日期）
+    market_date = day_start.strftime("%Y-%m-%d")
+    if not is_trade_day(market_date):
+        market_date = prev_trade_day(market_date)
+        print(f"[行情] {day_start.strftime('%Y-%m-%d')} 非交易日，使用上一交易日 {market_date} 涨停/跌停")
+    risk["trade_date"] = market_date  # 行情数据日 = 真实数据日期（v5.4）
+    ls = fetch_limit_stats(market_date)
+    if ls:
+        risk["limit_stats"] = ls
 
     save_bundle(data, str(data_path))
     gen = DashboardGenerator(data_path=str(data_path), config_path=str(config_path))
