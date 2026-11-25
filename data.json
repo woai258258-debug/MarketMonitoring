@@ -1,270 +1,270 @@
 {
   "summary": {
-    "overall_weighted_score": -0.1839,
-    "total_posts": 11174,
-    "valid_posts": 11161,
-    "spam_posts": 13,
-    "bullish_posts": 1799,
-    "bearish_posts": 3434,
-    "neutral_posts": 5928,
-    "sentiment_participation": 0.4689,
-    "panic_ratio": 0.6562,
-    "last_updated": "2026-11-24 11:24:44",
+    "overall_weighted_score": -0.3202,
+    "total_posts": 14853,
+    "valid_posts": 14843,
+    "spam_posts": 10,
+    "bullish_posts": 1768,
+    "bearish_posts": 4509,
+    "neutral_posts": 8566,
+    "sentiment_participation": 0.4229,
+    "panic_ratio": 0.7183,
+    "last_updated": "2026-11-25 09:29:44",
     "sources_used": [
       "eastmoney"
     ],
-    "scan_date": "2026-11-23",
-    "crawled_posts": 11174,
-    "window_start": "2026-11-23 00:00",
-    "window_end": "2026-11-24 00:00",
+    "scan_date": "2026-11-24",
+    "crawled_posts": 14853,
+    "window_start": "2026-11-24 00:00",
+    "window_end": "2026-11-25 00:00",
     "window_hours": "昨日全天",
     "top_bullish_words": [
       {
-        "word": "反弹",
-        "count": 357
-      },
-      {
         "word": "涨",
-        "count": 256
+        "count": 544
       },
       {
-        "word": "利好",
-        "count": 236
-      },
-      {
-        "word": "抄底",
-        "count": 186
-      },
-      {
-        "word": "涨停",
-        "count": 122
+        "word": "反弹",
+        "count": 222
       },
       {
         "word": "大涨",
-        "count": 106
+        "count": 215
       },
       {
-        "word": "拉升",
-        "count": 94
+        "word": "利好",
+        "count": 163
+      },
+      {
+        "word": "独立行情",
+        "count": 134
+      },
+      {
+        "word": "涨停",
+        "count": 117
       },
       {
         "word": "上涨",
-        "count": 93
+        "count": 106
+      },
+      {
+        "word": "暴涨",
+        "count": 92
+      },
+      {
+        "word": "抄底",
+        "count": 89
       },
       {
         "word": "放量",
-        "count": 71
+        "count": 80
       },
       {
-        "word": "牛市",
-        "count": 69
+        "word": "拉升",
+        "count": 64
+      },
+      {
+        "word": "赚钱",
+        "count": 55
+      },
+      {
+        "word": "买入",
+        "count": 55
       },
       {
         "word": "反转",
-        "count": 68
+        "count": 52
       },
       {
-        "word": "底部",
-        "count": 65
-      },
-      {
-        "word": "满仓",
-        "count": 59
-      },
-      {
-        "word": "冲",
-        "count": 49
-      },
-      {
-        "word": "加仓",
+        "word": "冲高",
         "count": 43
       }
     ],
     "top_bearish_words": [
       {
+        "word": "高开低走",
+        "count": 1605
+      },
+      {
         "word": "下跌预期",
-        "count": 1663
-      },
-      {
-        "word": "量化跌幅",
-        "count": 453
-      },
-      {
-        "word": "下跌",
-        "count": 297
-      },
-      {
-        "word": "保卫战",
-        "count": 190
-      },
-      {
-        "word": "破位整数",
-        "count": 177
-      },
-      {
-        "word": "做空",
-        "count": 154
+        "count": 1548
       },
       {
         "word": "冲高回落",
-        "count": 130
+        "count": 1271
       },
       {
-        "word": "大跌",
-        "count": 113
+        "word": "量化跌幅",
+        "count": 303
       },
       {
-        "word": "高开低走",
-        "count": 106
+        "word": "下跌",
+        "count": 286
+      },
+      {
+        "word": "做空",
+        "count": 226
       },
       {
         "word": "跳水",
-        "count": 105
+        "count": 213
       },
       {
-        "word": "老乡别走",
-        "count": 101
+        "word": "砸盘",
+        "count": 160
       },
       {
-        "word": "暴跌",
-        "count": 85
+        "word": "出货",
+        "count": 153
+      },
+      {
+        "word": "反弹离场",
+        "count": 147
+      },
+      {
+        "word": "大跌",
+        "count": 134
+      },
+      {
+        "word": "冲高没量",
+        "count": 132
+      },
+      {
+        "word": "低开低走",
+        "count": 115
+      },
+      {
+        "word": "不-涨",
+        "count": 106
       },
       {
         "word": "清仓",
-        "count": 84
-      },
-      {
-        "word": "空仓",
-        "count": 78
-      },
-      {
-        "word": "诱多",
-        "count": 72
+        "count": 105
       }
     ]
   },
   "top_bullish_words": [
     {
-      "word": "反弹",
-      "count": 357
-    },
-    {
       "word": "涨",
-      "count": 256
+      "count": 544
     },
     {
-      "word": "利好",
-      "count": 236
-    },
-    {
-      "word": "抄底",
-      "count": 186
-    },
-    {
-      "word": "涨停",
-      "count": 122
+      "word": "反弹",
+      "count": 222
     },
     {
       "word": "大涨",
-      "count": 106
+      "count": 215
     },
     {
-      "word": "拉升",
-      "count": 94
+      "word": "利好",
+      "count": 163
+    },
+    {
+      "word": "独立行情",
+      "count": 134
+    },
+    {
+      "word": "涨停",
+      "count": 117
     },
     {
       "word": "上涨",
-      "count": 93
+      "count": 106
+    },
+    {
+      "word": "暴涨",
+      "count": 92
+    },
+    {
+      "word": "抄底",
+      "count": 89
     },
     {
       "word": "放量",
-      "count": 71
+      "count": 80
     },
     {
-      "word": "牛市",
-      "count": 69
+      "word": "拉升",
+      "count": 64
+    },
+    {
+      "word": "赚钱",
+      "count": 55
+    },
+    {
+      "word": "买入",
+      "count": 55
     },
     {
       "word": "反转",
-      "count": 68
+      "count": 52
     },
     {
-      "word": "底部",
-      "count": 65
-    },
-    {
-      "word": "满仓",
-      "count": 59
-    },
-    {
-      "word": "冲",
-      "count": 49
-    },
-    {
-      "word": "加仓",
+      "word": "冲高",
       "count": 43
     }
   ],
   "top_bearish_words": [
     {
+      "word": "高开低走",
+      "count": 1605
+    },
+    {
       "word": "下跌预期",
-      "count": 1663
-    },
-    {
-      "word": "量化跌幅",
-      "count": 453
-    },
-    {
-      "word": "下跌",
-      "count": 297
-    },
-    {
-      "word": "保卫战",
-      "count": 190
-    },
-    {
-      "word": "破位整数",
-      "count": 177
-    },
-    {
-      "word": "做空",
-      "count": 154
+      "count": 1548
     },
     {
       "word": "冲高回落",
-      "count": 130
+      "count": 1271
     },
     {
-      "word": "大跌",
-      "count": 113
+      "word": "量化跌幅",
+      "count": 303
     },
     {
-      "word": "高开低走",
-      "count": 106
+      "word": "下跌",
+      "count": 286
+    },
+    {
+      "word": "做空",
+      "count": 226
     },
     {
       "word": "跳水",
-      "count": 105
+      "count": 213
     },
     {
-      "word": "老乡别走",
-      "count": 101
+      "word": "砸盘",
+      "count": 160
     },
     {
-      "word": "暴跌",
-      "count": 85
+      "word": "出货",
+      "count": 153
+    },
+    {
+      "word": "反弹离场",
+      "count": 147
+    },
+    {
+      "word": "大跌",
+      "count": 134
+    },
+    {
+      "word": "冲高没量",
+      "count": 132
+    },
+    {
+      "word": "低开低走",
+      "count": 115
+    },
+    {
+      "word": "不-涨",
+      "count": 106
     },
     {
       "word": "清仓",
-      "count": 84
-    },
-    {
-      "word": "空仓",
-      "count": 78
-    },
-    {
-      "word": "诱多",
-      "count": 72
+      "count": 105
     }
   ],
   "daily_trends": [
@@ -1007,129 +1007,14 @@
       "date": "2026-11-23",
       "sentiment_score": -0.1839,
       "count": 11161
+    },
+    {
+      "date": "2026-11-24",
+      "sentiment_score": -0.3202,
+      "count": 14843
     }
   ],
   "hourly_trends": [
-    {
-      "time": "2026-10-25 00:00",
-      "sentiment_score": -0.0738,
-      "count": 9
-    },
-    {
-      "time": "2026-10-25 01:00",
-      "sentiment_score": -0.2522,
-      "count": 6
-    },
-    {
-      "time": "2026-10-25 02:00",
-      "sentiment_score": -1.0,
-      "count": 1
-    },
-    {
-      "time": "2026-10-25 03:00",
-      "sentiment_score": -0.0013,
-      "count": 2
-    },
-    {
-      "time": "2026-10-25 04:00",
-      "sentiment_score": 0.0253,
-      "count": 4
-    },
-    {
-      "time": "2026-10-25 05:00",
-      "sentiment_score": 0.2466,
-      "count": 6
-    },
-    {
-      "time": "2026-10-25 06:00",
-      "sentiment_score": -0.7226,
-      "count": 9
-    },
-    {
-      "time": "2026-10-25 07:00",
-      "sentiment_score": -0.1936,
-      "count": 18
-    },
-    {
-      "time": "2026-10-25 08:00",
-      "sentiment_score": 0.0855,
-      "count": 31
-    },
-    {
-      "time": "2026-10-25 09:00",
-      "sentiment_score": -0.179,
-      "count": 30
-    },
-    {
-      "time": "2026-10-25 10:00",
-      "sentiment_score": 0.5495,
-      "count": 34
-    },
-    {
-      "time": "2026-10-25 11:00",
-      "sentiment_score": -0.3438,
-      "count": 41
-    },
-    {
-      "time": "2026-10-25 12:00",
-      "sentiment_score": -0.0915,
-      "count": 39
-    },
-    {
-      "time": "2026-10-25 13:00",
-      "sentiment_score": 0.2595,
-      "count": 33
-    },
-    {
-      "time": "2026-10-25 14:00",
-      "sentiment_score": 0.1626,
-      "count": 36
-    },
-    {
-      "time": "2026-10-25 15:00",
-      "sentiment_score": 0.1647,
-      "count": 35
-    },
-    {
-      "time": "2026-10-25 16:00",
-      "sentiment_score": 0.0735,
-      "count": 34
-    },
-    {
-      "time": "2026-10-25 17:00",
-      "sentiment_score": 0.1359,
-      "count": 38
-    },
-    {
-      "time": "2026-10-25 18:00",
-      "sentiment_score": -0.0576,
-      "count": 42
-    },
-    {
-      "time": "2026-10-25 19:00",
-      "sentiment_score": -0.0613,
-      "count": 39
-    },
-    {
-      "time": "2026-10-25 20:00",
-      "sentiment_score": 0.1542,
-      "count": 56
-    },
-    {
-      "time": "2026-10-25 21:00",
-      "sentiment_score": 0.093,
-      "count": 52
-    },
-    {
-      "time": "2026-10-25 22:00",
-      "sentiment_score": -0.1226,
-      "count": 42
-    },
-    {
-      "time": "2026-10-25 23:00",
-      "sentiment_score": -0.1692,
-      "count": 25
-    },
     {
       "time": "2026-10-26 00:00",
       "sentiment_score": -0.0646,
@@ -4609,19 +4494,139 @@
       "time": "2026-11-23 23:00",
       "sentiment_score": 0.0771,
       "count": 233
+    },
+    {
+      "time": "2026-11-24 00:00",
+      "sentiment_score": -0.0976,
+      "count": 70
+    },
+    {
+      "time": "2026-11-24 01:00",
+      "sentiment_score": 0.0113,
+      "count": 35
+    },
+    {
+      "time": "2026-11-24 02:00",
+      "sentiment_score": 0.3737,
+      "count": 19
+    },
+    {
+      "time": "2026-11-24 03:00",
+      "sentiment_score": 0.021,
+      "count": 20
+    },
+    {
+      "time": "2026-11-24 04:00",
+      "sentiment_score": 0.1024,
+      "count": 31
+    },
+    {
+      "time": "2026-11-24 05:00",
+      "sentiment_score": 0.1204,
+      "count": 36
+    },
+    {
+      "time": "2026-11-24 06:00",
+      "sentiment_score": 0.1719,
+      "count": 78
+    },
+    {
+      "time": "2026-11-24 07:00",
+      "sentiment_score": -0.0973,
+      "count": 157
+    },
+    {
+      "time": "2026-11-24 08:00",
+      "sentiment_score": 0.0214,
+      "count": 329
+    },
+    {
+      "time": "2026-11-24 09:00",
+      "sentiment_score": -0.2504,
+      "count": 1478
+    },
+    {
+      "time": "2026-11-24 10:00",
+      "sentiment_score": -0.3609,
+      "count": 2092
+    },
+    {
+      "time": "2026-11-24 11:00",
+      "sentiment_score": -0.4105,
+      "count": 2462
+    },
+    {
+      "time": "2026-11-24 12:00",
+      "sentiment_score": -0.3194,
+      "count": 346
+    },
+    {
+      "time": "2026-11-24 13:00",
+      "sentiment_score": -0.3281,
+      "count": 1920
+    },
+    {
+      "time": "2026-11-24 14:00",
+      "sentiment_score": -0.3319,
+      "count": 3814
+    },
+    {
+      "time": "2026-11-24 15:00",
+      "sentiment_score": -0.2826,
+      "count": 749
+    },
+    {
+      "time": "2026-11-24 16:00",
+      "sentiment_score": -0.2224,
+      "count": 231
+    },
+    {
+      "time": "2026-11-24 17:00",
+      "sentiment_score": -0.2097,
+      "count": 200
+    },
+    {
+      "time": "2026-11-24 18:00",
+      "sentiment_score": -0.4418,
+      "count": 183
+    },
+    {
+      "time": "2026-11-24 19:00",
+      "sentiment_score": -0.2732,
+      "count": 160
+    },
+    {
+      "time": "2026-11-24 20:00",
+      "sentiment_score": -0.2384,
+      "count": 102
+    },
+    {
+      "time": "2026-11-24 21:00",
+      "sentiment_score": -0.4805,
+      "count": 109
+    },
+    {
+      "time": "2026-11-24 22:00",
+      "sentiment_score": -0.4187,
+      "count": 114
+    },
+    {
+      "time": "2026-11-24 23:00",
+      "sentiment_score": -0.4122,
+      "count": 108
     }
   ],
   "risk": {
-    "total_score": 40.8,
-    "level": "⚠️ 预警",
-    "advice": "情绪偏悲观，控制仓位、观察企稳",
-    "trade_date": "2026-11-23",
+    "total_score": 34.0,
+    "level": "⛔ 极端",
+    "advice": "破位风险极高，建议大幅减仓/对冲",
+    "trade_date": "2026-11-24",
     "dimensions": {
       "sentiment": {
-        "score": 40.8,
-        "value": -0.1839,
+        "score": 34.0,
+        "value": -0.3202,
         "label": "论坛情绪(昨日窗口)",
-        "detail": "昨日情绪分 -0.1839",
+        "detail": "昨日情绪分 -0.3202",
         "thresholds": {
           "warning": 0.3,
           "danger": 0.5
@@ -4629,11 +4634,11 @@
       }
     },
     "limit_stats": {
-      "up": 28,
-      "down": 58,
-      "bust": 7,
-      "bust_rate": 0.2,
-      "date": "2026-11-22"
+      "up": 55,
+      "down": 2,
+      "bust": 68,
+      "bust_rate": 0.5528,
+      "date": "2026-11-24"
     }
   }
 }
